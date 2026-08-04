@@ -1,74 +1,239 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Stack } from 'expo-router';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { ContributionGraph } from 'react-native-chart-kit';
+import { Dimensions } from 'react-native';
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Stack.Screen 
+        options={{
+          title: 'Home',
+        }}
+      />
+      
+      <ScrollView style={styles.content}>
+        <View style={styles.welcomeSection}>
+          <Text style={styles.welcomeText}>Welcome back, Legend!</Text>
+          <Text style={styles.subtitle}>Ready for today's workout?</Text>
+        </View>
+
+        <View style={styles.quickActions}>
+          <TouchableOpacity style={styles.actionCard}>
+            <FontAwesome5 name="dumbbell" size={24} color="#444" />
+            <Text style={styles.actionText}>Start Workout</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionCard}>
+            <FontAwesome5 name="chart-line" size={24} color="#444" />
+            <Text style={styles.actionText}>View Progress</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionCard}>
+            <FontAwesome5 name="calendar-alt" size={24} color="#444" />
+            <Text style={styles.actionText}>Plan Workout</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionCard}>
+            <FontAwesome5 name="trophy" size={24} color="#444" />
+            <Text style={styles.actionText}>Personal Records</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.statsSection}>
+          <Text style={styles.sectionTitle}>Quick Stats</Text>
+          <View style={styles.heatmapContainer}>
+            <Text style={styles.heatmapTitle}>Gym Visit History</Text>
+            {/* ContributionGraph from react-native-chart-kit */}
+            {(() => {
+              const today = new Date();
+              const numDays = 105; // 15 weeks
+              const values = Array.from({ length: numDays }, (_, i) => {
+                const date = new Date(today);
+                date.setDate(today.getDate() - (numDays - 1 - i));
+                return {
+                  date: date.toISOString().slice(0, 10),
+                  count: Math.random() > 0.6 ? Math.floor(Math.random() * 3) + 1 : 0,
+                };
+              });
+              return (
+                <ContributionGraph
+                  values={values}
+                  endDate={today}
+                  numDays={numDays}
+                  width={Dimensions.get('window').width - 64}
+                  height={180}
+                  chartConfig={{
+                    backgroundColor: '#fff',
+                    backgroundGradientFrom: '#fff',
+                    backgroundGradientTo: '#fff',
+                    color: (opacity = 1) => `rgba(249, 178, 51, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(100, 100, 100, ${opacity})`,
+                    style: { borderRadius: 16 },
+                  }}
+                  gutterSize={4}
+                  tooltipDataAttrs={() => ({})}
+                />
+              );
+            })()}
+          </View>
+
+          <View style={styles.statsGrid}>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>12</Text>
+              <Text style={styles.statLabel}>Workouts This Month</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>3</Text>
+              <Text style={styles.statLabel}>PRs This Week</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>85%</Text>
+              <Text style={styles.statLabel}>Goal Progress</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.recentSection}>
+          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <View style={styles.recentWorkout}>
+            <Text style={styles.workoutTitle}>Upper Body Strength</Text>
+            <Text style={styles.workoutDate}>Yesterday • 45 min</Text>
+          </View>
+          <View style={styles.recentWorkout}>
+            <Text style={styles.workoutTitle}>Leg Day</Text>
+            <Text style={styles.workoutDate}>2 days ago • 60 min</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  welcomeSection: {
+    marginBottom: 24,
+  },
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#666',
+    marginTop: 4,
+  },
+  quickActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  actionCard: {
+    width: '48%',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  actionText: {
+    marginTop: 8,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#444',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  statsSection: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 16,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginHorizontal: 4,
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  recentSection: {
+    marginBottom: 24,
+  },
+  recentWorkout: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  workoutTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  workoutDate: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  heatmapContainer: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  heatmapTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 12,
   },
 });
