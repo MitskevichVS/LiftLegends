@@ -30,7 +30,15 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
+
+# Claude Code — both contain Trello API credentials.
+# .mcp.json holds them literally because MCP servers are spawned from Claude Code's
+# own environment and do not see the `env` block in settings.local.json.
+# Copy .mcp.json.example and fill it in on a fresh clone.
+.claude/settings.local.json
+.mcp.json
 
 # typescript
 *.tsbuildinfo
